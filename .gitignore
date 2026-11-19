@@ -1,0 +1,13 @@
+.local/
+.env
+.env.*
+!.env.example
+*.log
+*.sarif
+*.trivy.json
+*.trivy.txt
+__pycache__/
+*.pyc
+*.pem
+*.key
+*.kubeconfig

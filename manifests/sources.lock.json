@@ -1,0 +1,52 @@
+{
+  "argocd": {
+    "url": "https://codeload.github.com/argoproj/argo-cd/tar.gz/refs/tags/v3.6.1",
+    "sha256": "b138d3f36e56ed759289fd4dde91d3c8dade05d3d66fb1ac1d4f841554e928ec",
+    "version": "v3.6.1"
+  },
+  "kubectl": {
+    "url": "https://codeload.github.com/kubernetes/kubernetes/tar.gz/refs/tags/v1.35.9",
+    "sha256": "b390f0c5446a9414e8f0a7019ca54f858251187d193217a8051687bf7a960d01",
+    "version": "v1.35.9"
+  },
+  "trivy": {
+    "url": "https://codeload.github.com/aquasecurity/trivy/tar.gz/refs/tags/v0.76.2",
+    "sha256": "ea2670e94696508b12687e1f8ac35a6fe529893e351b7e38362c4a385ff2db9a",
+    "version": "v0.76.2"
+  },
+  "bao": {
+    "url": "https://codeload.github.com/openbao/openbao/tar.gz/refs/tags/v2.6.2",
+    "sha256": "097ef89f5d24174c57a56a2b6b529d66d7d4f237d42be175186c8683a9323ffc",
+    "version": "v2.6.2"
+  },
+  "yq": {
+    "url": "https://codeload.github.com/mikefarah/yq/tar.gz/refs/tags/v4.54.3",
+    "sha256": "93143d49b2a3bd6cb723477f585366b29f70c636af4653191d61b49b0c47de7f",
+    "version": "v4.54.3"
+  },
+  "kustomize": {
+    "url": "https://codeload.github.com/kubernetes-sigs/kustomize/tar.gz/refs/tags/kustomize/v5.8.3",
+    "sha256": "c823ae7b7e1461d82dfe7e592823796c6a98d9633cdbe33c64508b65c9911a57",
+    "version": "kustomize/v5.8.3"
+  },
+  "mc": {
+    "url": "https://codeload.github.com/minio/mc/tar.gz/refs/tags/RELEASE.2025-08-13T08-35-41Z",
+    "sha256": "29db22500374169a43951c7cef09daf19e7291ea5ba00ac10f321371b0a35b32",
+    "version": "RELEASE.2025-08-13T08-35-41Z"
+  },
+  "sonar": {
+    "url": "https://repo.maven.apache.org/maven2/org/sonarsource/scanner/cli/sonar-scanner-cli/8.4.0.16527/sonar-scanner-cli-8.4.0.16527.zip",
+    "sha256": "0bc442965fe778693e714234b75ad9ee8667d6fe53e90556f86eb215fa4073a5",
+    "version": "8.4.0.16527"
+  },
+  "cap": {
+    "url": "https://codeload.github.com/hashicorp/cap/tar.gz/refs/tags/v0.13.0",
+    "sha256": "04c73dfe136406e149e5010480e2658cf715a355ef9b9cce5dd5296cad9c7a06",
+    "version": "v0.13.0"
+  },
+  "okta": {
+    "url": "https://codeload.github.com/okta/okta-sdk-golang/tar.gz/refs/tags/v2.20.0",
+    "sha256": "6f55d15c18da018aa6a4b3e8ecb351498a9d6999c7f8a4938bd1b6cbec0d0f25",
+    "version": "v2.20.0"
+  }
+}

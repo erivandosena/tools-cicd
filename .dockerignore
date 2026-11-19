@@ -1,0 +1,8 @@
+**
+!Dockerfile
+!scripts/
+!scripts/build-tools.sh
+!scripts/runtime/
+!scripts/runtime/**
+!manifests/
+!manifests/sources.lock.json
