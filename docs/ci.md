@@ -17,16 +17,16 @@ Referências: [Docker com GitHub Actions](https://docs.docker.com/build/ci/githu
 
 ## GitLab CE
 
-Em **Settings → CI/CD → Variables**, crie `DOCKERHUB_USERNAME` e `DOCKERHUB_TOKEN`. Marque o token como **Masked** e **Protected** e proteja a branch principal. Use um Runner Docker com tag `tools-docker` e configuração:
+Em **Settings → CI/CD → Variables**, crie `DOCKERHUB_USERNAME` e `DOCKERHUB_TOKEN`. Marque o token como **Masked** e **Protected** e proteja a branch principal. Use o Runner de instância com tag `kubernetes` e executor Kubernetes em modo privilegiado:
 
 ```toml
-[runners.docker]
-  image = "docker:29.9.1-cli"
+[runners.kubernetes]
   privileged = true
-  volumes = ["/certs/client", "/cache"]
 ```
 
-O serviço `docker:29.9.1-dind` usa TLS na porta 2376. Reserve memória e disco para a compilação Go e permita containers DinD temporários para os testes.
+O serviço `docker:29.9.1-dind` usa TLS na porta 2376. Job e serviço compartilham o diretório de builds do Runner; os certificados são criados em `$CI_BUILDS_DIR/.docker-certs-$CI_JOB_ID`, fora do checkout e do contexto de build. A pasta é exclusiva do job e não depende de um volume adicional `/certs/client`. O job aguarda até 60 segundos pela inicialização do daemon antes de continuar. Reserve memória e disco adequados para a compilação Go e os testes DinD.
+
+Essa configuração é exclusiva do GitLab; o GitHub Actions mantém o runner Ubuntu e suas etapas existentes.
 
 Referências: [DinD no GitLab CE](https://docs.gitlab.com/ci/docker/docker_in_docker/), [variáveis CI/CD](https://docs.gitlab.com/ci/variables/).
 

@@ -5,8 +5,10 @@ workflow:
     - when: never
 variables:
   DOCKER_HOST: tcp://docker:2376
-  DOCKER_TLS_CERTDIR: /certs
-  DOCKER_CERT_PATH: /certs/client
+  # /builds é compartilhado entre job e serviços no executor Kubernetes.
+  # Fica fora do checkout para não ser apagado pelo git clean do Runner.
+  DOCKER_TLS_CERTDIR: "$CI_BUILDS_DIR/.docker-certs-$CI_JOB_ID"
+  DOCKER_CERT_PATH: "$CI_BUILDS_DIR/.docker-certs-$CI_JOB_ID/client"
   DOCKER_TLS_VERIFY: "1"
 images:
   stage: images
@@ -16,12 +18,17 @@ images:
       alias: docker
       variables:
         HEALTHCHECK_TCP_PORT: "2376"
-  tags: [tools-docker]
+  tags: [kubernetes]
   resource_group: dockerhub-tools
   timeout: 3h
   before_script:
     - apk add --no-cache bash python3 git
-    - docker info
+    - |
+      for attempt in $(seq 1 30); do
+        if docker info >/dev/null 2>&1; then break; fi
+        sleep 2
+      done
+      docker info
     - docker buildx version
   script:
     - export VERSION="1.6.0-gitlab.${CI_PIPELINE_ID}.${CI_JOB_ID}"

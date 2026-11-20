@@ -15,6 +15,7 @@ O formato segue o [Keep a Changelog 1.1.0](https://keepachangelog.com/pt-BR/1.1.
 - Uso de uma única opção `postconf -e` por chamada no setup e no entrypoint, corrigindo a falha de build e inicialização do Postfix.
 
 ### Alterado
+- Pipeline GitLab alinhada ao Runner de instância com tag kubernetes; TLS usa o diretório de builds compartilhado fora do checkout e aguarda o daemon iniciar. Workflow GitHub preservado.
 - Dados reais de contexto Kubernetes e SMTP ficam em configuração local ignorada; exemplos usam valores fictícios. Fornecedor OCI parametrizado por IMAGE_VENDOR. Identificadores de infraestrutura omitidos do histórico público, preservando datas, versões e resultados.
 - Política de publicação ajustada: CVEs bloqueiam Alpine; na Ubuntu são informativas. Relatórios completos, bloqueio por segredos, erros do scanner e testes continuam ativos em ambas.
 - Consolidação das receitas em um Dockerfile com alvos Alpine e Ubuntu.
