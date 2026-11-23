@@ -26,7 +26,7 @@ Em **Settings → CI/CD → Variables**, crie `DOCKERHUB_USERNAME` e `DOCKERHUB_
 
 O serviço `docker:29.9.1-dind` usa TLS na porta 2376. Job e serviço compartilham o diretório de builds do Runner; os certificados são criados em `$CI_BUILDS_DIR/.docker-certs-$CI_JOB_ID`, fora do checkout e do contexto de build. A pasta é exclusiva do job e não depende de um volume adicional `/certs/client`. O job aguarda até 60 segundos pela inicialização do daemon antes de continuar. Reserve memória e disco adequados para a compilação Go e os testes DinD.
 
-No fluxo normal, o GitLab cria um builder exclusivo por job com driver `docker-container`, separando o BuildKit daquele embarcado no daemon DinD. Os scripts mantêm `--load` para disponibilizar as imagens aos testes e à auditoria. O builder é reutilizado nos dois builds e removido após a coleta dos logs. Os limites do Runner permanecem iguais; a mitigação ainda precisa ser validada em execução no GitLab.
+No fluxo normal, o GitLab cria primeiro um contexto Docker exclusivo por job com endpoint DinD e certificados TLS explícitos (`ca.pem`, `cert.pem`, `key.pem`), e associa esse contexto ao builder. Depois cria um builder exclusivo por job com driver `docker-container`, separando o BuildKit daquele embarcado no daemon DinD. Os scripts mantêm `--load` para disponibilizar as imagens aos testes e à auditoria. O builder é reutilizado nos dois builds; builder e contexto são removidos após a coleta dos logs, quando existem. Os certificados permanecem fora dos artifacts e do contexto de build. Os limites do Runner permanecem iguais; a mitigação ainda precisa ser validada em execução no GitLab.
 
 Essa configuração é exclusiva do GitLab; o GitHub Actions mantém o runner Ubuntu e suas etapas existentes.
 
