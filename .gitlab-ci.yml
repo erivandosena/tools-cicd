@@ -10,6 +10,7 @@ variables:
   DOCKER_TLS_CERTDIR: "$CI_BUILDS_DIR/.docker-certs-$CI_JOB_ID"
   DOCKER_CERT_PATH: "$CI_BUILDS_DIR/.docker-certs-$CI_JOB_ID/client"
   DOCKER_TLS_VERIFY: "1"
+  DIND_READY_TIMEOUT: "300"
 images:
   stage: images
   image: docker:29.9.1-cli
@@ -34,7 +35,22 @@ images:
     - export VERSION="1.6.0-gitlab.${CI_PIPELINE_ID}.${CI_JOB_ID}"
     - python3 tests/test-project.py
     - printf '%s' "$DOCKERHUB_TOKEN" | docker login docker.io --username "$DOCKERHUB_USERNAME" --password-stdin
-    - BUILD_ONLY=1 bash scripts/build.sh
-    - bash scripts/publish.sh "$VERSION"
+    - |
+      if [ "${DIND_DIAGNOSTIC_ONLY:-0}" = "1" ]; then
+        for kind in alpine ubuntu; do
+          image="docker.io/unlb/tools-$kind:latest"
+          docker pull "$image"
+          bash scripts/test-local.sh "$image"
+        done
+        echo DIAGNOSTICO_DIND_PASS
+      else
+        BUILD_ONLY=1 bash scripts/build.sh
+        bash scripts/publish.sh "$VERSION"
+      fi
+  artifacts:
+    when: always
+    expire_in: 3 days
+    paths:
+      - .local/reports/
   after_script:
     - docker logout docker.io

@@ -47,3 +47,9 @@ O teste mantém as tags nos Pods e confere o digest executado. A configuração 
 ## Política de CVEs
 
 Alpine: qualquer CVE bloqueia publicação. Ubuntu: CVEs são registradas e permitem publicação. Segredos detectados, erros do scanner e falhas nos testes continuam bloqueando ambas. A mesma política vale para execução local, GitHub Actions e GitLab CI.
+
+## Diagnóstico DinD sem recompilar
+
+Em Build → Pipelines → New pipeline, selecione a principal e informe `DIND_DIAGNOSTIC_ONLY=1`. Esse modo baixa as imagens latest publicadas e executa somente os testes locais; não compila, audita ou publica. Sem essa variável, o fluxo normal permanece ativo.
+
+A espera pelo daemon é de até 300 segundos no GitLab e 120 por padrão nas outras execuções, configurável por `DIND_READY_TIMEOUT`. Se o teste falhar, estado e últimos logs aparecem no job. Os relatórios também são preservados por três dias nos artifacts GitLab, conforme as permissões de acesso do projeto.
