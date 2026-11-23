@@ -36,29 +36,13 @@ images:
     - python3 tests/test-project.py
     - printf '%s' "$DOCKERHUB_TOKEN" | docker login docker.io --username "$DOCKERHUB_USERNAME" --password-stdin
     - |
-      if [ "${DIND_DIAGNOSTIC_ONLY:-0}" = "1" ]; then
-        for kind in alpine ubuntu; do
-          image="docker.io/unlb/tools-$kind:latest"
-          docker pull "$image"
-          bash scripts/test-local.sh "$image"
-        done
-        echo DIAGNOSTICO_DIND_PASS
-      else
-        mkdir -p .local/reports
-        export BUILDX_BUILDER="tools-${CI_JOB_ID}"
-        docker context create "${BUILDX_BUILDER}-tls" \
-          --docker "host=$DOCKER_HOST,ca=$DOCKER_CERT_PATH/ca.pem,cert=$DOCKER_CERT_PATH/cert.pem,key=$DOCKER_CERT_PATH/key.pem"
-        docker buildx create --name "$BUILDX_BUILDER" --driver docker-container --use "${BUILDX_BUILDER}-tls"
-        docker buildx inspect --bootstrap > .local/reports/buildkit-builder.txt 2>&1 || {
-          cat .local/reports/buildkit-builder.txt
-          exit 1
-        }
-        cat .local/reports/buildkit-builder.txt
-        docker logs --follow --timestamps "buildx_buildkit_${BUILDX_BUILDER}0" \
-          > .local/reports/buildkit.log 2>&1 &
-        BUILD_ONLY=1 bash scripts/build.sh
-        bash scripts/publish.sh "$VERSION"
-      fi
+      export BUILDX_BUILDER="tools-${CI_JOB_ID}"
+      docker context create "${BUILDX_BUILDER}-tls" \
+        --docker "host=$DOCKER_HOST,ca=$DOCKER_CERT_PATH/ca.pem,cert=$DOCKER_CERT_PATH/cert.pem,key=$DOCKER_CERT_PATH/key.pem"
+      docker buildx create --name "$BUILDX_BUILDER" --driver docker-container --use "${BUILDX_BUILDER}-tls"
+      docker buildx inspect --bootstrap
+      BUILD_ONLY=1 bash scripts/build.sh
+      bash scripts/publish.sh "$VERSION"
   artifacts:
     when: always
     expire_in: 3 days
@@ -66,19 +50,11 @@ images:
       - .local/reports/
   after_script:
     - |
-      if [ "${DIND_DIAGNOSTIC_ONLY:-0}" != "1" ]; then
-        mkdir -p .local/reports
-        builder="tools-${CI_JOB_ID}"
-        container="buildx_buildkit_${builder}0"
-        docker inspect --format '{{json .State}}' "$container" \
-          > .local/reports/buildkit-state.json 2> .local/reports/buildkit-state-error.txt || true
-        docker logs --timestamps "$container" \
-          > .local/reports/buildkit-final.log 2>&1 || true
-        if docker buildx inspect "$builder" >/dev/null 2>&1; then
-          docker buildx rm "$builder" || true
-        fi
-        if docker context inspect "${builder}-tls" >/dev/null 2>&1; then
-          docker context rm "${builder}-tls" || true
-        fi
+      builder="tools-${CI_JOB_ID}"
+      if docker buildx inspect "$builder" >/dev/null 2>&1; then
+        docker buildx rm "$builder" || true
+      fi
+      if docker context inspect "${builder}-tls" >/dev/null 2>&1; then
+        docker context rm "${builder}-tls" || true
       fi
     - docker logout docker.io

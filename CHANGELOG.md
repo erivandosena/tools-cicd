@@ -38,6 +38,7 @@ O formato segue o [Keep a Changelog 1.1.0](https://keepachangelog.com/pt-BR/1.1.
 - LF para scripts e exclusões de artefatos locais/credenciais no Git.
 
 ### Removido do fluxo ativo
+- Após a aprovação GitLab 2745/job 14364 em 2026-11-23 (e15b348), removidos modo temporário DIND_DIAGNOSTIC_ONLY e capturas adicionais de debug do BuildKit/DinD. Mantidos builder separado, contexto TLS, testes, auditoria, relatórios normais e detecção de contêiner parado. A limpeza ainda exige execução das pipelines na nova revisão.
 - Geradores desativados, validadores dependentes deles e receitas duplicadas.
 - Remediações que exigiam imagens locais preexistentes.
 - Referências documentais a scripts ausentes e registros fictícios.

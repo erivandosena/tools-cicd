@@ -14,13 +14,6 @@ cleanup() {
   rc=$?; trap - EXIT
   if docker container inspect "$name" >/dev/null 2>&1; then
     docker logs "$name" > "$out/dind.log" 2>&1 || true
-    docker inspect --format '{{json .State}}' "$name" > "$out/dind-state.json" 2>&1 || true
-    if [[ "$rc" != 0 ]]; then
-      echo "[FAIL] DinD: $image; evidências: $out" >&2
-      cat "$out/dind-state.json" >&2
-      tail -n 80 "$out/dind.log" >&2
-      if [[ -f "$out/docker-info.txt" ]]; then tail -n 20 "$out/docker-info.txt" >&2; fi
-    fi
     docker rm -f -v "$name" >/dev/null || rc=1
   fi
   exit "$rc"
