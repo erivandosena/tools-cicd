@@ -7,6 +7,7 @@ O formato segue o [Keep a Changelog 1.1.0](https://keepachangelog.com/pt-BR/1.1.
 ## [Não lançado]
 
 ### Corrigido
+- GitLab passa a usar BuildKit separado com driver docker-container e builder por job, preservando logs/estado nos artifacts antes da limpeza. Mitigação da falha de sessão gRPC pendente de validação no Runner; GitHub e limites de recursos preservados.
 - Diagnóstico de falhas DinD com estado/logs no console, espera configurável e artifacts GitLab. Modo DIND_DIAGNOSTIC_ONLY testa imagens publicadas sem repetir o build.
 - Build passa a atualizar a base por tag e refazer as camadas do alvo, preservando cache Go, para não conservar pacotes vulneráveis em cache.
 - Auditoria atualizada da Alpine antiga `66f7fa10aa1c` em 2026-11-19 detectou seis CVEs no OpenJDK (uma crítica, duas altas e três médias); o resultado histórico zero CVE não é atribuído à auditoria atual.

@@ -44,6 +44,16 @@ images:
         done
         echo DIAGNOSTICO_DIND_PASS
       else
+        mkdir -p .local/reports
+        export BUILDX_BUILDER="tools-${CI_JOB_ID}"
+        docker buildx create --name "$BUILDX_BUILDER" --driver docker-container --use
+        docker buildx inspect --bootstrap > .local/reports/buildkit-builder.txt 2>&1 || {
+          cat .local/reports/buildkit-builder.txt
+          exit 1
+        }
+        cat .local/reports/buildkit-builder.txt
+        docker logs --follow --timestamps "buildx_buildkit_${BUILDX_BUILDER}0" \
+          > .local/reports/buildkit.log 2>&1 &
         BUILD_ONLY=1 bash scripts/build.sh
         bash scripts/publish.sh "$VERSION"
       fi
@@ -53,4 +63,15 @@ images:
     paths:
       - .local/reports/
   after_script:
+    - |
+      if [ "${DIND_DIAGNOSTIC_ONLY:-0}" != "1" ]; then
+        mkdir -p .local/reports
+        builder="tools-${CI_JOB_ID}"
+        container="buildx_buildkit_${builder}0"
+        docker inspect --format '{{json .State}}' "$container" \
+          > .local/reports/buildkit-state.json 2> .local/reports/buildkit-state-error.txt || true
+        docker logs --timestamps "$container" \
+          > .local/reports/buildkit-final.log 2>&1 || true
+        docker buildx rm "$builder" || true
+      fi
     - docker logout docker.io

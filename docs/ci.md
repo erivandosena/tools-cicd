@@ -26,6 +26,8 @@ Em **Settings → CI/CD → Variables**, crie `DOCKERHUB_USERNAME` e `DOCKERHUB_
 
 O serviço `docker:29.9.1-dind` usa TLS na porta 2376. Job e serviço compartilham o diretório de builds do Runner; os certificados são criados em `$CI_BUILDS_DIR/.docker-certs-$CI_JOB_ID`, fora do checkout e do contexto de build. A pasta é exclusiva do job e não depende de um volume adicional `/certs/client`. O job aguarda até 60 segundos pela inicialização do daemon antes de continuar. Reserve memória e disco adequados para a compilação Go e os testes DinD.
 
+No fluxo normal, o GitLab cria um builder exclusivo por job com driver `docker-container`, separando o BuildKit daquele embarcado no daemon DinD. Os scripts mantêm `--load` para disponibilizar as imagens aos testes e à auditoria. O builder é reutilizado nos dois builds e removido após a coleta dos logs. Os limites do Runner permanecem iguais; a mitigação ainda precisa ser validada em execução no GitLab.
+
 Essa configuração é exclusiva do GitLab; o GitHub Actions mantém o runner Ubuntu e suas etapas existentes.
 
 Referências: [DinD no GitLab CE](https://docs.gitlab.com/ci/docker/docker_in_docker/), [variáveis CI/CD](https://docs.gitlab.com/ci/variables/).
@@ -53,3 +55,7 @@ Alpine: qualquer CVE bloqueia publicação. Ubuntu: CVEs são registradas e perm
 Em Build → Pipelines → New pipeline, selecione a principal e informe `DIND_DIAGNOSTIC_ONLY=1`. Esse modo baixa as imagens latest publicadas e executa somente os testes locais; não compila, audita ou publica. Sem essa variável, o fluxo normal permanece ativo.
 
 A espera pelo daemon é de até 300 segundos no GitLab e 120 por padrão nas outras execuções, configurável por `DIND_READY_TIMEOUT`. Se o teste falhar, estado e últimos logs aparecem no job. Os relatórios também são preservados por três dias nos artifacts GitLab, conforme as permissões de acesso do projeto.
+
+Os artifacts incluem `buildkit-builder.txt`, `buildkit.log`, `buildkit-final.log` e `buildkit-state.json` no fluxo normal. A captura contínua começa após o bootstrap; o `after_script` coleta novamente os logs e o estado antes de remover o builder. A preservação depende de o job e o daemon permanecerem acessíveis para a coleta e o envio dos artifacts.
+
+Referência: [driver Docker container do Buildx](https://docs.docker.com/build/builders/drivers/docker-container/).
